@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <script>
+
+    var users = "https://jsonplaceholder.typicode.com/users"
+    var posts = "https://jsonplaceholder.typicode.com/posts"
+    var comments = "https://jsonplaceholder.typicode.com/comments"
+    var isChaining = true
+
+    var switchMethod = () => {
+        isChaining = !isChaining
+        console.log("isChaining:", isChaining)
+        $("#users").html(`<tr>
+                <td>Name</td>
+                <td>Email</td>
+                <td>Phone</td>
+                <td>Company</td>
+            </tr>`)
+        data();
+    }
+
+
+
+var data = async () => {
+
+    $("#fetchDisplay").html(`Fetch Method: ${isChaining ? "Chaining" : "Await/Async"}`)
+
+    var fetchUsersAwait = async (URL) => {
+        try {    
+            const res = await fetch(URL)
+            if(res.ok){
+                const data = await res.json()
+                for(user of data) {
+                    $("#users").append(`<tr><td>${user.name}</td><td>${user.email}</td><td>${user.phone}</td><td>${user.company.name}</td></tr>`)
+                }
+            }else{
+                return []
+            }
+        } catch (error) {
+            
+        }
+        
+    }
+    var fetchUsersChain = (URL) => {
+        fetch(URL).then(res => {
+            if(res.ok){
+                return res.json()
+            }else{
+                return []
+            }}
+        ).then(json => {
+            for(user of json) {
+                $("#users").append(`<tr><td>${user.name}</td><td>${user.email}</td><td>${user.phone}</td><td>${user.company.name}</td></tr>`)
+        }
+        })
+    }
+
+    var fetchPostsCommentsAwait = async (URL) => {
+        try {    
+            const res = await fetch(URL)
+            if(res.ok){
+                const data = await res.json()
+                for(post of data) {
+                    $("#posts").append(`<div id="${post.id}"><h2>${post.title}</h2><p>${post.body}<p></div>`)
+                }
+            }else{
+                return []
+            }
+        } catch (error) {
+            
+        }
+        
+    }
+    var fetchPostsCommentsChain = (URL) => {
+        fetch(URL).then(res => {
+            if(res.ok){
+                return res.json()
+            }else{
+                return []
+            }}
+        ).then(json => {
+            for(post of json) {
+                $("#posts").append(`<div id="${post.id}"><h2>${post.title}</h2><p>${post.body}<p></div>`)
+        }
+        })
+    }
+
+
+
+
+    // fetchUsersChain(users)
+    isChaining ? fetchUsersChain(users) : fetchUsersAwait(users)
+    isChaining ? fetchPostsCommentsChain(posts) : fetchPostsCommentsAwait(posts)
+}
+data();
+    </script>
+    <style>
+        #body {
+            width: 80%;
+            margin: auto;
+        }
+        table, th, td {
+            border: 1px solid whitesmoke;
+            border-collapse: collapse;
+            background-color: #444;
+            color: whitesmoke;
+        }
+        th, td {
+            padding: 10px;
+        }
+        #posts div {
+            border: 1px solid black;
+            margin: 10px;
+            padding: 10px;
+            background-color: #444;
+            color: whitesmoke;
+            border-radius: 2.5em;
+        }
+        nav{
+            text-align: center;
+            border: 1px solid black;
+        }
+            body{
+                background-color: #ccc;
+            }
+    </style>
+    <nav>
+        <h1 id="fetchDisplay">Fetch Method: Chaining</h1>
+        <button onClick="switchMethod()">Toggle Fetch Method</button>
+    </nav>
+    <div id="body">
+        <h2>Users</h2>
+        <table id="users">
+            <tr>
+                <td>Name</td>
+                <td>Email</td>
+                <td>Phone</td>
+                <td>Company</td>
+            </tr>
+        </table>
+        <div id="posts">
+            <h2>Posts</h2>
+        </div>
+    </div>
+</body>
+</html>
